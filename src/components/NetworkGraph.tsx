@@ -239,8 +239,12 @@ const NetworkGraph: React.FC<Props> = ({ data }) => {
   }, [data]);
 
   return (
-    <div ref={containerRef} className="w-full h-full relative overflow-hidden bg-[#f8fafc]">
-      <svg ref={svgRef} className="w-full h-full" />
+    <div 
+      ref={containerRef} 
+      className="w-full h-full relative overflow-hidden bg-slate-50/90 bg-cover bg-center"
+      style={{ backgroundImage: "url('/council_bg.png')", backgroundBlendMode: "overlay" }}
+    >
+      <svg ref={svgRef} className="w-full h-full relative z-10" />
       
       <AnimatePresence>
         {selectedNode && (
