@@ -2,6 +2,8 @@
 
 Interaktivni mrežni graf za analizu političkih odnosa, koalicija, suradnji i raspodjele vijećnika u **Gradskom vijeću Rijeke**.
 
+> 📚 **Akademski rad / Seminar:** Cjelokupni uvod, metodološki pristup i političke zaključke vezane uz problematiku riječke lokalne samouprave možete pročitati u službenom dokumentu: **[SEMINAR.md](./SEMINAR.md)**.
+
 ---
 
 ## 📊 Pregled Sastava i Moći (Stranke)
