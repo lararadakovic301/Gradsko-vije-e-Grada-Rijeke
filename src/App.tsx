@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import NetworkGraph from './components/NetworkGraph';
+import SeminarUvod from './components/SeminarUvod';
 import { RIJEKA_GRAPH_DATA } from './data';
-import { motion } from 'motion/react';
-import { Users, LayoutGrid, Search, Filter } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Users, LayoutGrid, Search, Filter, BookOpen } from 'lucide-react';
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSeminar, setShowSeminar] = useState(true);
+  const [activeHighlight, setActiveHighlight] = useState('');
+
+  const handleHighlightTerm = (term: string) => {
+    setActiveHighlight(term);
+    setSearchTerm(term);
+  };
 
   const filteredData = {
     nodes: RIJEKA_GRAPH_DATA.nodes.filter(n => 
-      n.name.toLowerCase().includes(searchTerm.toLowerCase())
+      n.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      n.id.toLowerCase() === searchTerm.toLowerCase()
     ),
     links: RIJEKA_GRAPH_DATA.links.filter(l => {
       const sourceId = typeof l.source === 'string' ? l.source : (l.source as any).id;
@@ -20,7 +29,9 @@ export default function App() {
       
       return (
         sourceNode?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        targetNode?.name.toLowerCase().includes(searchTerm.toLowerCase())
+        targetNode?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        sourceId.toLowerCase() === searchTerm.toLowerCase() ||
+        targetId.toLowerCase() === searchTerm.toLowerCase()
       );
     })
   };
@@ -36,18 +47,33 @@ export default function App() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
             <input 
               type="text" 
               placeholder="Pretraži vijećnike..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                if (!e.target.value) setActiveHighlight('');
+              }}
               className="pl-10 pr-4 py-1.5 bg-slate-100 rounded-full text-xs border-none focus:ring-2 focus:ring-blue-500/20 w-48 transition-all hover:bg-slate-200"
               id="search-input"
             />
           </div>
+
+          <button
+            onClick={() => setShowSeminar(!showSeminar)}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold transition-all border ${
+              showSeminar 
+                ? 'bg-blue-600 text-white border-blue-700 shadow-sm' 
+                : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Uvod i Seminar</span>
+          </button>
 
           <div className="flex gap-4">
             <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full border border-blue-100/50">
@@ -128,19 +154,44 @@ export default function App() {
         </aside>
 
         {/* Network Visualization Area */}
-        <main className="flex-1 relative bg-[#f8fafc]">
-          <NetworkGraph data={searchTerm ? filteredData : RIJEKA_GRAPH_DATA} />
-          
-          {/* Legend Overlay from Design */}
-          <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md border border-slate-200 p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Analitika odnosa</span>
+        <main className="flex-1 relative bg-[#f8fafc] flex min-w-0">
+          <div className="flex-1 relative min-w-0 h-full">
+            <NetworkGraph data={searchTerm ? filteredData : RIJEKA_GRAPH_DATA} />
+            
+            {/* Legend Overlay from Design */}
+            <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-md border border-slate-200 p-5 rounded-2xl shadow-2xl max-w-xs pointer-events-none z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Analitika odnosa</span>
+              </div>
+              <p className="text-[11px] text-slate-500 leading-normal font-medium">
+                Veličina čvora predstavlja utjecaj (vijećnici). Isprekidane linije označavaju trendove suradnje na temelju zajedničkih inicijativa.
+              </p>
             </div>
-            <p className="text-[11px] text-slate-500 leading-normal font-medium">
-              Veličina čvora predstavlja utjecaj (vijećnici). Isprekidane linije označavaju trendove suradnje na temelju zajedničkih inicijativa.
-            </p>
           </div>
+
+          <AnimatePresence>
+            {showSeminar && (
+              <motion.div
+                initial={{ x: '100%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: '100%', opacity: 0 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                className="absolute lg:relative top-0 right-0 h-full w-full sm:w-[450px] bg-white border-l border-slate-200 z-30 shadow-2xl lg:shadow-none shrink-0"
+              >
+                <div className="w-full h-full relative">
+                  {/* Close button for absolute/mobile view */}
+                  <button 
+                    onClick={() => setShowSeminar(false)} 
+                    className="absolute top-5 right-5 lg:hidden p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100 z-50 font-bold text-lg"
+                  >
+                    &times;
+                  </button>
+                  <SeminarUvod onHighlightTerm={handleHighlightTerm} activeHighlight={activeHighlight} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </main>
       </div>
 

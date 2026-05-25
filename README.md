@@ -1,4 +1,4 @@
-# 🏛️ Analiza Odnosa i Sastav Gradskog Vijeća Rijeke (2026)
+# 🏛️ Analiza Odnosa i Sastav Gradskog Vijeća Rijeke (2024-2026)
 
 Interaktivni mrežni graf za analizu političkih odnosa, koalicija, suradnji i raspodjele vijećnika u **Gradskom vijeću Rijeke**.
 
